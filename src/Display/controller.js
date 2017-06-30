@@ -15,12 +15,13 @@ export const Types = fromJS([
 
 const Actions = Object.freeze({
   LOAD: 'CARDS_LOAD',
-  FILTER: 'CARDS_FILTER'
+  FILTER: 'CARDS_FILTER',
+  ARTIST: 'CARDS_ARTIST'
 });
 
 const initialState = fromJS({
   cards: [],
-  filter: Set(['plains']),
+  filter: 'plains',
   artist: Set()
 });
 
@@ -29,9 +30,11 @@ export const displayReducer = (state = initialState, action) => {
     case Actions.LOAD:
       return state.set('cards', action.cards);
     case Actions.FILTER:
-      return state.update(action.filter, filter => filter.has(action.value) ?
-        filter.delete(action.value) :
-        filter.add(action.value)
+      return state.update('filter', filter => filter === action.filter ? '' : action.filter);
+    case Actions.ARTIST:
+      return state.update('artist', artist => artist.has(action.artist) ?
+        artist.delete(action.artist) :
+        artist.add(action.artist)
       );
     default:
       return state;
@@ -54,7 +57,9 @@ const makeMapStateToProps = () => {
 
   const getFilteredCards = createSelector(
     [getFilter, getSortedCards],
-    (filter, cards) => cards.filterNot(({id}) => filter.some(f => !id.includes(f)))
+    (filter, cards) => filter ?
+      cards.filter(({id}) => id.includes(filter)) :
+      cards
   );
 
   const getFilteredArtists = createSelector(
@@ -84,7 +89,8 @@ const mapDispatchToProps = dispatch => ({
   onLoad: () => fetch('https://api.deckbrew.com/mtg/cards?supertype=basic')
     .then(res => res.json())
     .then(cards => dispatch({type: Actions.LOAD, cards: fromJS(cards)})),
-  onFilter: (filter, value) => () => dispatch({type: Actions.FILTER, filter, value})
+  onFilter: filter => () => dispatch({type: Actions.FILTER, filter}),
+  onSelect: artist => () => dispatch({type: Actions.ARTIST, artist})
 });
 
 export const connector = compose(

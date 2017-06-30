@@ -28,6 +28,15 @@ h4 {
   padding: 0 10px;
 }
 
+button {
+  text-transform: capitalize;
+  background: none;
+  border: 0;
+  color: #ddd;
+  outline: none;
+  cursor: pointer;
+}
+
 .side {
   flex: 0 220px;
   background: #2e497b;
@@ -48,6 +57,7 @@ h4 {
   display: flex;
   justify-content: center;
   flex-flow: row wrap;
+  align-items: center;
 }
 
 .cards img {

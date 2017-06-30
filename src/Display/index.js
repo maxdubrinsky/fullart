@@ -10,22 +10,23 @@ const Filters = ({filter, onFilter}) => (
     <h4>Types</h4>
     <ul className={styles.filters}>
       {Types.map(type => 
-        <li key={type} className={filter.has(type) ? styles.checked : ''}>
-          <input type="checkbox" checked={filter.has(type)} onChange={onFilter('filter', type)} />
-          <label>{type}</label>
+        <li key={type} className={type === filter ? styles.checked : ''}>
+          <button onClick={onFilter(type)}>
+            {type}
+          </button>
         </li>
       )}
     </ul>
   </div>
 );
 
-const Artists = ({artist, artists, onFilter}) => (
+const Artists = ({artist, artists, onSelect}) => (
   <div>
     <h4>Artists</h4>
     <ul className={styles.artists}>
       {artists.map(curr =>
         <li key={curr} className={artist.has(curr) ? styles.checked : ''}>
-          <input type="checkbox" onChange={onFilter('artist', curr)} />
+          <input type="checkbox" onChange={onSelect(curr)} />
           <label>{curr}</label>
         </li>
       )}
@@ -41,12 +42,12 @@ const Cards = ({cards}) => (
   </div>
 );
 
-const Display = ({cards, artists, filter, artist, onFilter}) => (
+const Display = ({cards, artists, filter, artist, onFilter, onSelect}) => (
   <div className={styles.display}>
     <div className={styles.side}>
       <h3>Full Art</h3>
       <Filters filter={filter} onFilter={onFilter} />
-      <Artists artist={artist} artists={artists} onFilter={onFilter} />
+      <Artists {...{artist, artists, onSelect}} />
     </div>
     <Cards cards={cards} />
   </div>

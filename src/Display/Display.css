@@ -57,7 +57,7 @@ button {
   display: flex;
   justify-content: center;
   flex-flow: row wrap;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .cards img {

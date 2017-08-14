@@ -1,17 +1,20 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import {connector, Types} from './controller';
+import {connector} from './controller';
+import {Types} from './selector';
 import styles from './Display.css';
 
 import 'whatwg-fetch';
 
-const Filters = ({filter, onFilter}) => (
+const LandTypes = ({land, onFilter}) => (
   <div>
     <h4>Types</h4>
     <ul className={styles.filters}>
       {Types.map(type => 
-        <li key={type} className={type === filter ? styles.checked : ''}>
-          <button onClick={onFilter(type)}>
+        <li key={type} className={type === land ? styles.checked : ''}>
+          <button onClick={() => onFilter(type)}>
             {type}
           </button>
         </li>
@@ -20,19 +23,50 @@ const Filters = ({filter, onFilter}) => (
   </div>
 );
 
-const Artists = ({artist, artists, onSelect}) => (
+LandTypes.propTypes = {
+  land: PropTypes.oneOf(Types.toArray()),
+  onFilter: PropTypes.func.isRequired
+};
+
+const Artist = ({artist, selected, onSelect}) => (
+  <li className={selected ? styles.checked : ''}>
+    <input type="checkbox" onChange={onSelect} checked={selected} />
+    <label>{artist}</label>
+  </li>
+);
+
+Artist.propTypes = {
+  artist: PropTypes.string.isRequired,
+  selected: PropTypes.bool.isRequired,
+  onSelect: PropTypes.func.isRequired
+};
+
+const Artists = ({all, selected, expanded, onFilter, onExpand}) => (
   <div>
     <h4>Artists</h4>
     <ul className={styles.artists}>
-      {artists.map(curr =>
-        <li key={curr} className={artist.has(curr) ? styles.checked : ''}>
-          <input type="checkbox" onChange={onSelect(curr)} />
-          <label>{curr}</label>
-        </li>
+      {all.map((curr, i) =>
+        <Artist
+          key={i}
+          artist={curr}
+          selected={selected.has(curr)}
+          onSelect={() => onFilter(curr)} />
       )}
+      {expanded ?
+        <a onClick={onExpand}>Show fewer</a> :
+        <a onClick={onExpand}>Show more</a>
+      }
     </ul>
   </div>
 );
+
+Artists.propTypes = {
+  all: ImmutablePropTypes.set.isRequired,
+  selected: ImmutablePropTypes.set.isRequired,
+  expanded: PropTypes.bool.isRequired,
+  onFilter: PropTypes.func.isRequired,
+  onExpand: PropTypes.func.isRequired
+};
 
 const Cards = ({cards}) => (
   <div className={styles.cards}>
@@ -42,15 +76,36 @@ const Cards = ({cards}) => (
   </div>
 );
 
-const Display = ({cards, artists, filter, artist, onFilter, onSelect}) => (
+Cards.propTypes = {
+  cards: ImmutablePropTypes.list.isRequired
+};
+
+const Display = ({cards, artists, filter, expanded, onFilter, onExpand}) => (
   <div className={styles.display}>
     <div className={styles.side}>
       <h3>Full Art</h3>
-      <Filters filter={filter} onFilter={onFilter} />
-      <Artists {...{artist, artists, onSelect}} />
+      <LandTypes land={filter.get('land')} onFilter={onFilter('LAND_TYPE')} />
+      <Artists
+        all={artists}
+        selected={filter.get('artists')}
+        expanded={expanded}
+        onFilter={onFilter('ARTIST')}
+        onExpand={onExpand} />
     </div>
     <Cards cards={cards} />
   </div>
 );
+
+Display.propTypes = {
+  cards: ImmutablePropTypes.list.isRequired,
+  artists: ImmutablePropTypes.set.isRequired,
+  filter: ImmutablePropTypes.contains({
+    artists: ImmutablePropTypes.set,
+    land: PropTypes.string
+  }).isRequired,
+  expanded: PropTypes.bool.isRequired,
+  onFilter: PropTypes.func.isRequired,
+  onExpand: PropTypes.func.isRequired
+};
 
 export default connector(Display);

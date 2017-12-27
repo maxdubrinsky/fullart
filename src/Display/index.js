@@ -2,31 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
+import LandTypes from './LandTypes';
+
 import {connector} from './controller';
-import {Types} from './selector';
 import styles from './Display.css';
 
 import 'whatwg-fetch';
-
-const LandTypes = ({land, onFilter}) => (
-  <div>
-    <h4>Types</h4>
-    <ul className={styles.filters}>
-      {Types.map(type => 
-        <li key={type} className={type === land ? styles.checked : ''}>
-          <button onClick={() => onFilter(type)}>
-            {type}
-          </button>
-        </li>
-      )}
-    </ul>
-  </div>
-);
-
-LandTypes.propTypes = {
-  land: PropTypes.oneOf(Types.toArray()),
-  onFilter: PropTypes.func.isRequired
-};
 
 const Artist = ({artist, selected, onSelect}) => (
   <li className={selected ? styles.checked : ''}>
@@ -70,9 +51,12 @@ Artists.propTypes = {
 
 const Cards = ({cards}) => (
   <div className={styles.cards}>
-    {cards.map(({editions}) => editions
-      .filter(({multiverse_id}) => multiverse_id)
-      .map(({image_url, multiverse_id}) => <img src={image_url} key={multiverse_id} title={multiverse_id} />))}
+    {cards.map(({editions}) => 
+      editions.filter(({multiverse_id}) => multiverse_id)
+              .map(({image_url, multiverse_id}) =>
+                <img src={image_url} key={multiverse_id} title={multiverse_id} />
+              )
+    )}
   </div>
 );
 

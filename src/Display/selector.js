@@ -1,14 +1,7 @@
 import {createSelector} from 'reselect';
-import {fromJS, Set} from 'immutable';
+import {Set} from 'immutable';
 
-export const Types = fromJS([
-  'plains',
-  'island',
-  'swamp',
-  'mountain',
-  'forest',
-  'wastes'
-]);
+import {Types} from './utils';
 
 export const getFilter = ({display: {filter}}) => filter;
 export const getExpanded = ({display: {expanded}}) => expanded;

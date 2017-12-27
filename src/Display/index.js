@@ -2,6 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
+import {AppBar, Drawer, Checkbox, Button} from 'material-ui';
+import List, {ListItem, ListItemText, ListSubheader} from 'material-ui/List';
+import ExpandMore from 'material-ui-icons/ExpandMore';
+import ExpandLess from 'material-ui-icons/ExpandLess';
+
 import {connector} from './controller';
 import {Types} from './selector';
 import styles from './Display.css';
@@ -9,30 +14,29 @@ import styles from './Display.css';
 import 'whatwg-fetch';
 
 const LandTypes = ({land, onFilter}) => (
-  <div>
-    <h4>Types</h4>
-    <ul className={styles.filters}>
-      {Types.map(type => 
-        <li key={type} className={type === land ? styles.checked : ''}>
-          <button onClick={() => onFilter(type)}>
-            {type}
-          </button>
-        </li>
-      )}
-    </ul>
-  </div>
+  <List dense className={styles.controls}>
+    <ListSubheader>Land Types</ListSubheader>
+    {Types.map(type => 
+      <ListItem key={type}>
+        <Checkbox
+          checked={type === land}
+          onChange={() => onFilter(type)} />
+        <ListItemText className={styles.landItem} primary={type} />
+      </ListItem>
+    )}
+  </List>
 );
 
 LandTypes.propTypes = {
-  land: PropTypes.oneOf(Types.toArray()),
+  land: PropTypes.string.isRequired,
   onFilter: PropTypes.func.isRequired
 };
 
 const Artist = ({artist, selected, onSelect}) => (
-  <li className={selected ? styles.checked : ''}>
-    <input type="checkbox" onChange={onSelect} checked={selected} />
-    <label>{artist}</label>
-  </li>
+  <ListItem>
+    <Checkbox onChange={onSelect} checked={selected} />
+    <ListItemText primary={artist} />
+  </ListItem>
 );
 
 Artist.propTypes = {
@@ -42,22 +46,28 @@ Artist.propTypes = {
 };
 
 const Artists = ({all, selected, expanded, onFilter, onExpand}) => (
-  <div>
-    <h4>Artists</h4>
-    <ul className={styles.artists}>
-      {all.map((curr, i) =>
-        <Artist
-          key={i}
-          artist={curr}
-          selected={selected.has(curr)}
-          onSelect={() => onFilter(curr)} />
-      )}
-      {expanded ?
-        <a onClick={onExpand}>Show fewer</a> :
-        <a onClick={onExpand}>Show more</a>
-      }
-    </ul>
-  </div>
+  <List dense>
+    <ListSubheader>Artists</ListSubheader>
+    {all.map((curr, i) =>
+      <Artist
+        key={i}
+        artist={curr}
+        selected={selected.has(curr)}
+        onSelect={() => onFilter(curr)} />
+    )}
+    {expanded ?
+      <Button
+        icon={<ExpandLess />}
+        onClick={onExpand}>
+        Show Fewer
+      </Button> :
+      <Button
+        icon={<ExpandMore />}
+        onClick={onExpand}>
+        Show More
+      </Button>
+    }
+  </List>
 );
 
 Artists.propTypes = {
@@ -82,8 +92,8 @@ Cards.propTypes = {
 
 const Display = ({cards, artists, filter, expanded, onFilter, onExpand}) => (
   <div className={styles.display}>
-    <div className={styles.side}>
-      <h3>Full Art</h3>
+    <Drawer docked={true} open={true}>
+      <AppBar title="Full Art" />
       <LandTypes land={filter.get('land')} onFilter={onFilter('LAND_TYPE')} />
       <Artists
         all={artists}
@@ -91,7 +101,7 @@ const Display = ({cards, artists, filter, expanded, onFilter, onExpand}) => (
         expanded={expanded}
         onFilter={onFilter('ARTIST')}
         onExpand={onExpand} />
-    </div>
+    </Drawer>
     <Cards cards={cards} />
   </div>
 );

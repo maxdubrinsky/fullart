@@ -1,5 +1,4 @@
-var path = require('path');
-var combineLoaders = require('webpack-combine-loaders');
+const path = require('path');
 
 module.exports = {
   devtool: 'eval',
@@ -18,26 +17,27 @@ module.exports = {
     port: 8080
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
-      },
-      {
-        test: /\.css$/,
-        exclude: /\.usable\.css$/,
-        loader: combineLoaders([
+        use: {
+          loader: 'babel-loader'
+        }
+      }, {
+        test: /\.scss$/,
+        use: [
+          'style-loader',
           {
-            loader: 'style-loader'
-          }, {
             loader: 'css-loader',
-            query: {
+            options: {
+              sourceMap: true,
               modules: true,
-              localIdentName: '[name]__[local]___[hash:base64:5]'
+              localIdentName: '[path][name]__[local]--[hash:base64:5]'
             }
-          }
-        ])
+          },
+          'sass-loader'
+        ]
       }
     ]
   }

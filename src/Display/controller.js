@@ -18,7 +18,6 @@ const initialState = fromJS({
     artists: Set(),
     land: 'plains'
   },
-  artist: Set(),
   expanded: false
 });
 
@@ -27,9 +26,9 @@ export const displayReducer = (state = initialState, action) => {
   case Actions.LOAD:
     return state.set('cards', action.cards);
   case Actions.LAND_TYPE:
-    return state.updateIn(['filter', 'land'], curr =>
-      curr === action.value ? '' : action.value
-    );
+    return state
+      .updateIn(['filter', 'land'], curr => curr === action.value ? '' : action.value)
+      .set('expanded', false);
   case Actions.ARTIST:
     return state.updateIn(['filter', 'artists'], artists =>
       artists.has(action.value) ?

@@ -1,21 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import List, {ListItem, ListItemText, ListSubheader} from 'material-ui/List';
+import Radio from 'material-ui/Radio';
 
 import {Types} from '../utils';
-import styles from './LandTypes.css';
+
+import styles from './LandTypes.scss';
 
 const LandTypes = ({land, onFilter}) => (
   <div>
-    <h4>Types</h4>
-    <ul>
-      {Types.map(type => 
-        <li key={type} className={type === land ? styles.checked : ''}>
-          <button onClick={() => onFilter(type)}>
-            {type}
-          </button>
-        </li>
-      )}
-    </ul>
+    <List subheader={<ListSubheader>Types</ListSubheader>}>
+      {Types.map(type => (
+        <ListItem key={type} dense button
+                  onClick={() => onFilter(type)}>
+          <Radio checked={land === type} />
+          <ListItemText className={styles.type} primary={type} />
+        </ListItem>
+      ))}
+    </List>
   </div>
 );
 

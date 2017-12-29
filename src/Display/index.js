@@ -2,72 +2,26 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
+import Toolbar from 'material-ui/Toolbar';
+import Typography from 'material-ui/Typography';
+import Drawer from 'material-ui/Drawer';
+
 import LandTypes from './LandTypes';
+import Artists from './Artists';
+import Cards from './Cards';
 
 import {connector} from './controller';
-import styles from './Display.css';
+
+import styles from './Display.scss';
 
 import 'whatwg-fetch';
 
-const Artist = ({artist, selected, onSelect}) => (
-  <li className={selected ? styles.checked : ''}>
-    <input type="checkbox" onChange={onSelect} checked={selected} />
-    <label>{artist}</label>
-  </li>
-);
-
-Artist.propTypes = {
-  artist: PropTypes.string.isRequired,
-  selected: PropTypes.bool.isRequired,
-  onSelect: PropTypes.func.isRequired
-};
-
-const Artists = ({all, selected, expanded, onFilter, onExpand}) => (
-  <div>
-    <h4>Artists</h4>
-    <ul className={styles.artists}>
-      {all.map((curr, i) =>
-        <Artist
-          key={i}
-          artist={curr}
-          selected={selected.has(curr)}
-          onSelect={() => onFilter(curr)} />
-      )}
-      {expanded ?
-        <a onClick={onExpand}>Show fewer</a> :
-        <a onClick={onExpand}>Show more</a>
-      }
-    </ul>
-  </div>
-);
-
-Artists.propTypes = {
-  all: ImmutablePropTypes.set.isRequired,
-  selected: ImmutablePropTypes.set.isRequired,
-  expanded: PropTypes.bool.isRequired,
-  onFilter: PropTypes.func.isRequired,
-  onExpand: PropTypes.func.isRequired
-};
-
-const Cards = ({cards}) => (
-  <div className={styles.cards}>
-    {cards.map(({editions}) => 
-      editions.filter(({multiverse_id}) => multiverse_id)
-              .map(({image_url, multiverse_id}) =>
-                <img src={image_url} key={multiverse_id} title={multiverse_id} />
-              )
-    )}
-  </div>
-);
-
-Cards.propTypes = {
-  cards: ImmutablePropTypes.list.isRequired
-};
-
 const Display = ({cards, artists, filter, expanded, onFilter, onExpand}) => (
-  <div className={styles.display}>
-    <div className={styles.side}>
-      <h3>Full Art</h3>
+  <div>
+    <Drawer type="permanent" classes={{paper: styles.drawerPaper}}>
+      <Toolbar>
+        <Typography type="title">Full Art</Typography>
+      </Toolbar>
       <LandTypes land={filter.get('land')} onFilter={onFilter('LAND_TYPE')} />
       <Artists
         all={artists}
@@ -75,14 +29,16 @@ const Display = ({cards, artists, filter, expanded, onFilter, onExpand}) => (
         expanded={expanded}
         onFilter={onFilter('ARTIST')}
         onExpand={onExpand} />
-    </div>
-    <Cards cards={cards} />
+    </Drawer>
+    <main className={styles.content}>
+      <Cards cards={cards} />
+    </main>
   </div>
 );
 
 Display.propTypes = {
   cards: ImmutablePropTypes.list.isRequired,
-  artists: ImmutablePropTypes.set.isRequired,
+  artists: ImmutablePropTypes.list.isRequired,
   filter: ImmutablePropTypes.contains({
     artists: ImmutablePropTypes.set,
     land: PropTypes.string

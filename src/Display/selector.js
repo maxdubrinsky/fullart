@@ -4,7 +4,6 @@ import {Set} from 'immutable';
 import {Types} from './utils';
 
 export const getFilter = ({display: {filter}}) => filter;
-export const getExpanded = ({display: {expanded}}) => expanded;
 
 const getCards = ({display: {cards}}) => cards;
 const getSelectedLand = ({display: {filter: {land}}}) => land;
@@ -27,16 +26,14 @@ const getFilteredCards = createSelector(
 );
 
 export const getFilteredArtists = createSelector(
-  [getFilteredCards, getExpanded],
-  (cards, expanded) => cards
+  [getFilteredCards],
+  cards => cards
     .reduce(
       (artists, {editions}) => artists.union(editions.map(({artist}) => artist.replace(/&amp;/g, '&'))),
       Set()
     )
     .sort()
-    .takeWhile(function() {
-      return expanded || this.count++ < 10;
-    }, {count: 0})
+    .toList()
 );
 
 export const getCardsFilteredByArtists = createSelector(

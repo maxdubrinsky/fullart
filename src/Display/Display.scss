@@ -1,0 +1,13 @@
+$drawerWidth: 290px;
+
+.drawerPaper {
+  width: $drawerWidth;
+
+  > div:not(:first-child) {
+    background-color: inherit;
+  }
+}
+
+.content {
+  margin-left: $drawerWidth;
+}

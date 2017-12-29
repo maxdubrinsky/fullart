@@ -8,7 +8,7 @@ import {ExpandMore, ExpandLess} from 'material-ui-icons';
 const MAX_ARTISTS = 10;
 
 const Artist = ({artist, selected, onSelect}) => (
-  <ListItem dense button onChange={onSelect}>
+  <ListItem dense button onClick={onSelect}>
     <Checkbox checked={selected} />
     <ListItemText primary={artist} />
   </ListItem>

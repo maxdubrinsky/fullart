@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import List, {ListItem, ListItemText, ListItemIcon, ListSubheader} from 'material-ui/List';
 import Checkbox from 'material-ui/Checkbox';
+import Divider from 'material-ui/Divider';
 import {ExpandMore, ExpandLess} from 'material-ui-icons';
 
-const MAX_ARTISTS = 10;
+import {MAX_ARTISTS} from '../utils';
+
+import styles from './Artists.scss';
 
 const Artist = ({artist, selected, onSelect}) => (
   <ListItem dense button onClick={onSelect}>
@@ -20,18 +23,29 @@ Artist.propTypes = {
   onSelect: PropTypes.func.isRequired
 };
 
-const Artists = ({all, selected, expanded, onFilter, onExpand}) => (
+const Artists = ({remaining, selected, expanded, onFilter, onExpand, onClear}) => (
   <div>
-    <List subheader={<ListSubheader>Artists</ListSubheader>}>
-      {all
-        .takeWhile((_, i) => i < MAX_ARTISTS || expanded)
-        .map((curr, i) =>
-          <Artist key={i} artist={curr}
-                  selected={selected.has(curr)}
-                  onSelect={() => onFilter(curr)} />
-        )
-      }
-      {all.size >= MAX_ARTISTS ? 
+    <List subheader={
+            <ListSubheader>
+              Artists
+              {selected.size ?
+                <a className={styles.clear} onClick={onClear}>Clear</a> :
+                null
+              }
+            </ListSubheader>
+          }>
+      {selected.sort().map(artist =>
+        <Artist key={artist} artist={artist}
+                selected={true}
+                onSelect={() => onFilter(artist)} />
+      )}
+      {selected.size ? <Divider /> : null}
+      {remaining.map(artist =>
+        <Artist key={artist} artist={artist}
+                selected={false}
+                onSelect={() => onFilter(artist)} />
+      )}
+      {selected.size + remaining.size >= MAX_ARTISTS ? 
         <ListItem dense button onClick={onExpand}>
           <ListItemIcon>
             {expanded ? <ExpandLess /> : <ExpandMore />}
@@ -45,11 +59,12 @@ const Artists = ({all, selected, expanded, onFilter, onExpand}) => (
 );
 
 Artists.propTypes = {
-  all: ImmutablePropTypes.list.isRequired,
+  remaining: ImmutablePropTypes.map.isRequired,
   selected: ImmutablePropTypes.set.isRequired,
   expanded: PropTypes.bool.isRequired,
   onFilter: PropTypes.func.isRequired,
-  onExpand: PropTypes.func.isRequired
+  onExpand: PropTypes.func.isRequired,
+  onClear: PropTypes.func.isRequired
 };
 
 export default Artists;

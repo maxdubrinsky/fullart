@@ -1,13 +1,14 @@
 import {createSelector} from 'reselect';
 import {Set} from 'immutable';
 
-import {Types} from './utils';
+import {Types, MAX_ARTISTS} from './utils';
 
 export const getFilter = ({display: {filter}}) => filter;
 
 const getCards = ({display: {cards}}) => cards;
 const getSelectedLand = ({display: {filter: {land}}}) => land;
 const getSelectedArtists = ({display: {filter: {artists}}}) => artists;
+const getExpanded = ({display: {expanded}}) => expanded;
 
 const getSortedCards = createSelector(
   [getCards],
@@ -26,14 +27,18 @@ const getFilteredCards = createSelector(
 );
 
 export const getFilteredArtists = createSelector(
-  [getFilteredCards],
-  cards => cards
+  [getFilteredCards, getSelectedArtists, getExpanded],
+  (cards, selected, expanded) => cards
     .reduce(
-      (artists, {editions}) => artists.union(editions.map(({artist}) => artist.replace(/&amp;/g, '&'))),
+      (artists, {editions}) => artists.union(
+        editions.map(({artist}) => artist.replace(/&amp;/g, '&'))
+      ),
       Set()
     )
+    .filterNot(artist => selected.has(artist))
     .sort()
     .toList()
+    .takeWhile((_, i) => i < MAX_ARTISTS - selected.size || expanded)
 );
 
 export const getCardsFilteredByArtists = createSelector(

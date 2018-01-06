@@ -8,3 +8,5 @@ export const Types = fromJS([
   'forest',
   'wastes'
 ]);
+
+export const MAX_ARTISTS = 10;
